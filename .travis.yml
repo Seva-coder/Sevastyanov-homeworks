@@ -10,7 +10,7 @@ install:
 
 
 script:
-    - pylint dz1
+    - pylint dz1/task_class.py
 
 sudo: false
 
