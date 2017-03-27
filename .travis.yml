@@ -5,10 +5,12 @@ python:
     - 3.6
 
 install:
-    - pip install -r requirements/base.txt
+    - pip install pylint
+    - pip install pyyaml
+
 
 script:
-    - pylint todo
+    - pylint dz1
 
 sudo: false
 
