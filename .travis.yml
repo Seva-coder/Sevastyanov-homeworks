@@ -5,7 +5,7 @@ python:
     - 3.6
 
 install:
-    - pip install pyyaml
+    - pip install -r requirements/base.txt
 
 script:
     - pylint todo
