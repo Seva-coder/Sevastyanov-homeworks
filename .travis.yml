@@ -7,8 +7,8 @@ python:
 install:
     - pip install pyyaml
 
-#script:
-#    - pylint todo
+script:
+    - pylint todo
 
 sudo: false
 
