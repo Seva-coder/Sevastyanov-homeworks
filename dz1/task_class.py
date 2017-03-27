@@ -49,7 +49,8 @@ class Roadmap:
 
     @property
     def today(self):
-        return [item for item in self.tasks if item.estimate.date() == date.today()]  # сравниваем только по датам
+        # сравниваем только по датам
+        return [item for item in self.tasks if item.estimate.date() == date.today()]
 
     def filter(self, state):
         return [item for item in self.tasks if item.state == state]
@@ -63,7 +64,7 @@ def WsgiApp(environment, start_response_callback):
         ('Content-Type', 'text/html; charset=utf-8'),
     ]
     answer = ''
-    tasks =[]
+    tasks = []
     # по условию необходимо использовать класс Task
     for item in get_dataset('dataset.yml'):
         current_task = Task(item[0], item[2], item[1])  # в соответствии с порядком
