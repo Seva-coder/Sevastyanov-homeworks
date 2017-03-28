@@ -19,7 +19,7 @@ class Task:
     state = property()
 
     @property
-    def state(self):
+    def state(self):  # pylint: disable-msg=E2204
         return self._state
 
     @state.setter
@@ -32,7 +32,7 @@ class Task:
     is_failed = property()
 
     @property
-    def is_failed(self):
+    def is_failed(self):  # pylint: disable-msg=E3504
         return True if self._state == 'in_progress' and self.estimate < datetime.now() else False
 
     @property
