@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ obj }} <b>"{{ deleted }}"</b> благополучно удалена
+    <br>
+
+{% if obj == 'Roadmap' %}
+<a href={% url 'all_roadmap' %}>Вернуться к списку Roadmap's</a>
+{% endif %}
+
+{% if obj == 'Задача' %}
+<a href={% url 'all_tasks' %}>Вернуться к списку Задач</a>
+{% endif %}
+{% endblock %}

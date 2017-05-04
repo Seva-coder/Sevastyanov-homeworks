@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Форма создания</h2>
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            {{ field.label }} {{ field }}
+            <br>
+        {% endfor %}
+        <br>
+        <button type="submit">Сохранить</button>
+    </form>
+    {% if display %}
+        {% if red_title %}
+            <span class="redtext"> {{ task_title|upper }} </span> Дата: {{ date }}
+        {% else %}
+            {{ task_title }} Дата: {{ date }}
+        {% endif %}
+    {% endif %}
+    <br>
+    {{ info }}
+{% endblock %}

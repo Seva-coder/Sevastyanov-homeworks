@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Редактирование задачи</h2>
+    <form action="{% url 'edit_tsk' %}" method="post">
+        {% csrf_token %}
+
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+
+        {% for field in form.visible_fields %}
+            {{ field.label }} {{ field }}
+            <br>
+        {% endfor %}
+        <br>
+        <button type="submit">Сохранить</button>
+    </form>
+    {{ info }}
+    <br>
+
+<a href={% url 'all_tasks' %}>Вернуться к списку задач</a>
+<br>
+
+{% endblock %}

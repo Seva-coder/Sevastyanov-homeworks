@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Просмотр всех roadmaps:</h2>
+    <br>
+    {% for road in tasks %}
+        {{ road.roadmap_name }} <a href={% url 'killer' road.id %}>удалить</a>
+        <br>
+    {% empty %}
+        <b>Roadmap'ов теперь нет!</b>
+    {% endfor %}
+<br>
+<br>
+<a href={% url 'create_roadmap' %}>Создать Roadmap</a>
+<br>
+<a href={% url 'all_tasks' %}>Список задач</a>
+{% endblock %}
