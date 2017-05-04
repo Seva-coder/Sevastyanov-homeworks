@@ -16,14 +16,12 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from create.views import create_roadmap, all_roadmaps, delete_roadmap, create_task, all_tasks, delete_task, edit_task
-from edit.views import edition
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^createRoad/$', create_roadmap, name='create_roadmap'),
     url(r'^viewRoads/$', all_roadmaps, name='all_roadmap'),
     url(r'^deleteRoadmap/(?P<id_road>[0-9]+)$', delete_roadmap, name='killer'),
-    url(r'^edit/$', edition, name='edit'),
     url(r'^createTask/$', create_task, name='create_task'),
     url(r'^viewTasks/$', all_tasks, name='all_tasks'),
     url(r'^deleteTask/(?P<id_task>[0-9]+)$', delete_task, name='del_tsk'),
