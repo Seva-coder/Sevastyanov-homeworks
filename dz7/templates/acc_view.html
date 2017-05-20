@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Просмотр аккаунта</h2>
+
+    <br>
+
+<table border="1">
+    <caption>Данные пользоваетля</caption>
+    <tr>   <th>E-m@il:</th> <td>{{ request.user.email }}</td> </tr>   <tr>
+    <tr>   <th>Имя:</th> <td>{{ request.user.first_name }}</td> </tr>   <tr>
+    <tr>   <th>Фамилия</th> <td>{{ request.user.last_name }}</td> </tr>   <tr>
+    <tr>   <th>Возраст:</th> <td>{{ request.user.age }}</td> </tr>   <tr>
+    <tr>   <th>Локация:</th> <td>{{ request.user.region }}</td> </tr>   <tr>
+</table>
+
+    <br>
+    <br>
+
+<a href={% url 'all_tasks' %}>Вернуться к списку задач</a>
+<br>
+
+{% endblock %}

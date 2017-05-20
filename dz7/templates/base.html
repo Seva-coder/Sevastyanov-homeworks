@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>213</title>
+    </head>
+    <style>
+    .redtext {
+    color: red; /* Красный цвет выделения */
+    }
+    </style>
+    <body>
+        Большой брат определил вас как: {{ request.user }}
+        {% block content %}{% endblock %}
+
+        {% if form.errors %}
+        <h6>ОШИБКИ формы!<h6>
+        <ul>
+            {% for key,value in form.errors.items %}
+                <li>{{ key|escape }} : {{ value|escape }}</li>
+            {% endfor %}
+         </ul>
+        {% endif %}
+
+    </body>
+</html>

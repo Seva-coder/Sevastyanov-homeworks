@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Редактирование аккаунта</h2>
+
+    <form action="{% url 'acc_edit' %}" method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            {{ field.label }} {{ field }}
+            <br>
+        {% endfor %}
+        <br>
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <br>
+    <br>
+
+<a href={% url 'acc_view' %}>Вернуться к просмотру аккаунта</a>
+<br>
+
+{% endblock %}

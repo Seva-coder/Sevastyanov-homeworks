@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Просмотр всех задач:</h2>
+    <br>
+    {% for task in tasks %}
+<b>"{{ task.title }}"</b>, <i>{{ task.state }}</i> {{ task.estimate }} Из сборника:{{ task.roadmap.roadmap_name }} <a href={% url 'edit_tsk' task.id %}>Редактировать</a> <a href={% url 'del_tsk' task.id %}>удалить</a>
+        <br>
+    {% empty %}
+        <b>Все задачи удалены</b>
+    {% endfor %}
+<br>
+<br>
+<a href={% url 'create_task' %}>Создать задачу</a>
+<br>
+<a href={% url 'all_roadmap' %}>Список Roamap's</a>
+<br>
+<a href={% url 'stats_all' %}>Просмотр стаистики</a>
+{% endblock %}

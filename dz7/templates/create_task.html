@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Создаём Task</h2>
+    {% if form %}
+    <form action="{% url 'create_task' %}" method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            {{ field.label }} {{ field }}
+            <br>
+        {% endfor %}
+        <br>
+        <button type="submit">Сохранить</button>
+    </form>
+    {% endif %}
+    <br>
+    {% if not form %}
+        <a href={% url 'create_roadmap' %}>создать Roadmap</a>
+    {% endif %}
+    <br>
+    {{ info }}
+    <br>
+    <br>
+<a href={% url 'all_tasks' %}>Вернуться к списку задач</a>
+<br>
+
+{% endblock %}

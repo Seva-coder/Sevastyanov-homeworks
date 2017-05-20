@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Просмотр статистики</h2>
+
+    <br>
+<table border="1">
+    <caption>таблица статистики</caption>
+    <tr>
+    <th>Номер недели</th>
+    <th>Интервал дат</th>
+    <th>Создано задач</th>
+    <th>Решено задач</th>
+    </tr>
+    {% for stroke in info %}
+        <tr>
+        {% for item in range %}
+            {# как-то избежать прямого перечисления #}
+            <td> {% cycle stroke.0 stroke.1 stroke.2 stroke.3 as data %} </td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+    <br>
+<table border="1">
+    <caption>Очки</caption>
+    <tr>
+        <th>Месяц</th>
+        <th>Зачислено</th>
+    </tr>
+    {% for stroke in score %}
+        <tr>
+        {% for item in range2 %}
+            {# как-то избежать прямого перечисления #}
+            <td> {% cycle stroke.0 stroke.1 as data %} </td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+
+    <br>
+    <br>
+<a href={% url 'all_tasks' %}>Вернуться к списку задач</a>
+<br>
+
+{% endblock %}
