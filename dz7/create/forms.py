@@ -1,4 +1,3 @@
-import pytz
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django import forms
@@ -11,7 +10,8 @@ class CreateTask(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'state', 'estimate']
-        exclude =['creation_date']
+        exclude = ['creation_date']
+
     def __init__(self, *args, **kwargs):  # шайтан-код для автоматического обновления select'a на форме
         self.choices = kwargs.pop('choices')
         super().__init__(*args, **kwargs)
@@ -20,7 +20,7 @@ class CreateTask(forms.ModelForm):
 
     def clean_estimate(self):
         value = self.cleaned_data.get('estimate')
-        if value < timezone.now():      # datetime.now(tz=pytz.timezone('Europe/Moscow')):
+        if value < timezone.now():
             raise ValidationError('back to the future not allowed!')
         return value
 
@@ -43,11 +43,12 @@ class CreateRoadmap(forms.ModelForm):
 
 class EditTask(CreateTask):
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')  #  для выдачи юзеру только его Roadmap's в выпадающем списке
+        self.user = kwargs.pop('user')  # для выдачи юзеру только его Roadmap's в выпадающем списке
         kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
         super().__init__(*args, **kwargs)
-    id_task = forms.IntegerField(widget = forms.HiddenInput())
-    def clean_estimate(self):  #чтобы можно было испралять state после того как срок прошёл
+    id_task = forms.IntegerField(widget=forms.HiddenInput())
+
+    def clean_estimate(self):  # чтобы можно было испралять state после того как срок прошёл
         value = self.cleaned_data.get('estimate')
         return value
 
@@ -66,9 +67,10 @@ class CreateNewUser(UserCreationForm):
 class EditUser(forms.ModelForm):  # а как унаследоваться от CreateNewUser без полей и проверки паролей?
     class Meta:
         model = TaskUser
-        exclude =['email','password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff', 'is_active', 'date_joined', 'username']
+        exclude = ['email', 'password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff',
+                   'is_active', 'date_joined', 'username']
+
     def __init__(self, *args, **kwargs):  # включение обязательных полей
         super().__init__(*args, **kwargs)
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
-

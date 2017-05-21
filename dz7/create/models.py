@@ -9,7 +9,7 @@ class TaskUser(AbstractUser):
     age = models.IntegerField(verbose_name='Возраст:', null=True, blank=True)
     region = models.CharField(max_length=20, verbose_name='Регион:', blank=True, null=True)
     username = models.CharField(max_length=10, verbose_name='Имя которое не нужно:', blank=True, null=True) # не убрать(
-    REQUIRED_FIELDS = ['phone', 'first_name', 'last_name'] # 'username'
+    REQUIRED_FIELDS = ['phone', 'first_name', 'last_name', 'username'] # 'username'
     USERNAME_FIELD = 'email'
 
 
