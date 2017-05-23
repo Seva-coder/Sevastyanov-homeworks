@@ -1,16 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Просмотр всех roadmaps:</h2>
-    <br>
+
+{% if tasks.exists %}
+
+<table class="table table-striped">
+    <caption>Сборники задач:</caption>
+    <thead>
+    <tr>
+        <th>Навание Roadmap:</th>
+    </tr>
+    </thead>
+
     {% for road in tasks %}
-        {{ road.roadmap_name }} <a href={% url 'killer' road.id %}>удалить</a>
-        <br>
-    {% empty %}
-        <b>Roadmap'ов теперь нет!</b>
+    <tr>
+        <td>{{ road.roadmap_name }}</td>
+        <td><a href={% url 'killer' road.id %}>удалить</a></td>
+    </tr>
     {% endfor %}
-<br>
-<br>
-<a href={% url 'create_roadmap' %}>Создать Roadmap</a>
-<br>
-<a href={% url 'all_tasks' %}>Список задач</a>
+</table>
+
+{% else %}
+
+<div class="well">Сборники отсутствуют, <a href={% url 'create_roadmap' %}>создать</a></div>
+
+{% endif %}
+
 {% endblock %}

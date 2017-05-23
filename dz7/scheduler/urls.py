@@ -17,6 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from create.views import create_roadmap, all_roadmaps, delete_roadmap, create_task, all_tasks, delete_task, edit_task, statistic_all, create_user, view_user, edit_user
+from django.views.generic.base import TemplateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -36,4 +37,5 @@ urlpatterns = [
     url(r'^password_change/done/$', auth_views.PasswordChangeView.as_view(template_name='password_change_done.html'), name='password_change_done'),
     url(r'^viewUser/$', view_user, name='acc_view'),
     url(r'^editUser/$', edit_user, name='acc_edit'),
+    url(r'^$', TemplateView.as_view(template_name='default.html')),
 ]

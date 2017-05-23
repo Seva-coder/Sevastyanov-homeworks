@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-
+from django.contrib.messages import constants as messages
+from django.conf.global_settings import DATETIME_INPUT_FORMATS
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -109,7 +110,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'create.TaskUser'
 LOGIN_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/statsAll/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -119,7 +121,7 @@ TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False # изначально TRUE
 
 USE_TZ = True
 
@@ -128,5 +130,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
 PROJECT_HOST = 'todo.ru'
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    50: 'danger',
+}
+
+DATETIME_INPUT_FORMATS.append('%Y-%m-%dT%H:%M')
+DATETIME_INPUT_FORMATS.append('%d.%m.%Y %H:%M')

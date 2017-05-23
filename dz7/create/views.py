@@ -4,35 +4,42 @@ from decimal import *
 from datetime import datetime
 from django.shortcuts import render, redirect
 from django.db.models import Max, ExpressionWrapper, DurationField, F, Sum
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.messages import constants as message_constants
 from django.utils import timezone
 from .forms import CreateRoadmap, CreateTask, EditTask, CreateNewUser, EditUser
 from .models import Roadmap, Task, Scores, TaskUser
 
 
 MAX_ID = math.pow(2, 32)  # ограничение бд на int, чтобы из delete не вылезти за диапазон
-
+MESSAGE_TAGS = {message_constants.ERROR: ''}
 
 @login_required
 def create_roadmap(request):
     if request.method == 'POST':
         form = CreateRoadmap(request.POST,  user=request.user)
-        info = 'Форма заполнена, но некорректна'
         if form.is_valid():
             road = form.save(commit=False)
             road.user = request.user
             road.save()
-            info = 'Roadmap сохранён'
+            messages.add_message(request, messages.SUCCESS, 'Roadmap создан')
+            return redirect('all_roadmap')
+        else:
+            messages.add_message(request, messages.WARNING, 'В форме ошибка')
+            if Roadmap.objects.filter(roadmap_name=request.POST.get('roadmap_name'), user=request.user).exists():  # безопасно ли брать прямо из POST?
+                messages.add_message(request, messages.WARNING, 'Roadmap с таким именем уже существует!')
+            return render(
+                request, 'create_roadmap.html',
+                {'form': form}
+            )
     else:
-        info = 'Форма не заполнена'
         form = CreateRoadmap(initial={'roadmap_name': 'название сборника задач'}, user=request.user)
-    return render(
-        request, 'create_roadmap.html',
-        {'form': form, 'info': info}
-    )
+        return render(
+            request, 'create_roadmap.html',
+            {'form': form}
+        )
 
 
 @login_required
@@ -47,12 +54,15 @@ def all_roadmaps(request):
 @login_required
 def delete_roadmap(request, id_road):
     if int(id_road) > MAX_ID:
-        raise PermissionDenied
+        messages.add_message(request, messages.ERROR, 'вы не можете удалить этот Roadmap ;)')
+        return redirect('all_roadmap')
     elif Roadmap.objects.filter(pk=id_road).exists() and Roadmap.objects.get(pk=id_road).user == request.user:
         Roadmap.objects.get(pk=id_road).delete()
+        messages.add_message(request, messages.SUCCESS, 'Roadmap удалён')
+        return redirect('all_roadmap')
     else:
-        raise PermissionDenied
-    return redirect('all_roadmap')
+        messages.add_message(request, messages.ERROR, 'вы не можете удалить этот Roadmap ;)')
+        return redirect('all_roadmap')
 
 
 @login_required
@@ -68,11 +78,13 @@ def create_task(request):
             task.save()
             score = Scores(task=task)
             score.save()
-            messages.add_message(request, messages.INFO, 'Задача добавлена')
+            messages.add_message(request, messages.SUCCESS, 'Задача добавлена')
             return redirect('all_tasks')
         else:
             messages.add_message(request, messages.WARNING, 'В форме что-то не так')
-            new_form = CreateTask(request.POST, choices=variants, initial={'title': request.POST['title']})
+            new_form = CreateTask(request.POST, choices=variants, initial={'title': request.POST['title'],
+                                                                           'estimate': request.POST['estimate'],
+                                                                           'state': request.POST.get('state')})
             return render(
                 request, 'create_task.html',
                 {'form': new_form}
@@ -82,7 +94,7 @@ def create_task(request):
             messages.add_message(request, messages.WARNING, 'Нет Roadmaps, надо сначала создать их')
             return render(
                 request, 'create_task.html',
-            )  # не выдаём форму, шаблон на её место подставит ссылку н асоздание Roadmap
+            )  # не выдаём форму, шаблон на её место подставит ссылку на создание Roadmap
         else:
             form = CreateTask(choices=variants)
             return render(
@@ -103,13 +115,15 @@ def all_tasks(request):
 @login_required
 def delete_task(request, id_task):
     if int(id_task) > MAX_ID:
-        raise PermissionDenied
+        messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
+        return redirect('all_tasks')
     elif Task.objects.filter(pk=id_task).exists() and Task.objects.get(pk=id_task).user == request.user:  # удалить только свои Task
         Task.objects.get(pk=id_task).delete()
-        messages.add_message(request, messages.INFO, 'Задача удалена')
+        messages.add_message(request, messages.SUCCESS, 'Задача удалена')
+        return redirect('all_tasks')
     else:
-        raise PermissionDenied
-    return redirect('all_tasks')
+        messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
+        return redirect('all_tasks')
 
 
 @login_required
@@ -119,7 +133,8 @@ def edit_task(request, id_task=-1):  # '-1' переназначится из с
         if form.is_valid():
             id_task = form.cleaned_data['id_task']
             if int(id_task) > MAX_ID:
-                raise PermissionDenied
+                messages.add_message(request, messages.ERROR, 'вы не можете редактировать эту задачу ;)')
+                return redirect('all_tasks')
             elif Task.objects.filter(pk=id_task).exists() and Task.objects.get(pk=id_task).user == request.user:
                 old_task = Task.objects.get(pk=id_task)
                 old_state = old_task.state
@@ -149,31 +164,33 @@ def edit_task(request, id_task=-1):  # '-1' переназначится из с
                         else:
                             Scores.objects.filter(task=task).update(points=Decimal(scores))
                         Scores.objects.filter(task=task).update(date=today)
-                messages.add_message(request, messages.INFO, 'Задача отредактирована')
+                messages.add_message(request, messages.SUCCESS, 'Задача отредактирована')
                 return redirect('all_tasks')
             else:
-                raise PermissionDenied
+                messages.add_message(request, messages.ERROR, 'вы не можете редактировать эту задачу ;)')
+                return redirect('all_tasks')
         else:
             messages.add_message(request, messages.WARNING, 'В форме ошибка')
-            new_form = EditTask(initial={'title': request.POST['title'], 'state': request.POST.get('state', False),
-                                         'estimate': request.POST['estimate'], 'id_task': request.POST['id_task']},
+            new_form = EditTask(initial={'id_task': request.POST.get('id_task'), 'roadmap': request.POST.get('roadmap')},
                                 user=request.user)
             return render(
                 request, 'edit_task.html',
-                {'form': new_form}
+                {'form': new_form, 'fail': True}
             )
     else:
         if int(id_task) < MAX_ID and Task.objects.filter(pk=id_task).exists() and \
                         Task.objects.get(pk=id_task).user == request.user:
             current_task = Task.objects.get(pk=id_task)
             form = EditTask(initial={'title': current_task.title, 'state': current_task.state,
-                                     'estimate': current_task.estimate, 'id_task': id_task}, user=request.user)
+                                     'estimate': current_task.estimate, 'id_task': id_task,
+                                     'roadmap': current_task.roadmap.id}, user=request.user)
             return render(
                 request, 'edit_task.html',
-                {'form': form}
+                {'form': form, 'fail': False}
             )
         else:
-            raise PermissionDenied
+            messages.add_message(request, messages.ERROR, 'вы не можете редактировать эту задачу ;)')
+            return redirect('all_tasks')
 
 
 @login_required
@@ -210,7 +227,7 @@ def create_user(request):
         form = CreateNewUser(request.POST)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.INFO, 'Аккаунт создан')
+            messages.add_message(request, messages.SUCCESS, 'Аккаунт создан')
             user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password1'])
             login(request, user)
             return redirect('acc_view')
@@ -247,7 +264,7 @@ def edit_user(request):
         form = EditUser(request.POST, instance=man)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.INFO, 'Профиль отредактирован')
+            messages.add_message(request, messages.SUCCESS, 'Профиль отредактирован')
             return redirect('acc_view')
         else:
             messages.add_message(request, messages.WARNING, 'В форме были ошибки')  # не знаю какие, но на всякий случай

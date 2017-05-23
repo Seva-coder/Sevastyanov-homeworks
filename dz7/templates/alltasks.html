@@ -1,18 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Просмотр всех задач:</h2>
-    <br>
+
+
+
+{% if tasks.exists %}
+
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
+
+
+<table class="table table-striped">
+    <caption>Задачи:</caption>
+    <thead>
+    <tr>
+        <th>Навание задачи</th>
+        <th>Готова/нет</th>
+        <th>Ожидаемая дата решения</th>
+        <th>Сборник</th>
+    </tr>
+    </thead>
+
     {% for task in tasks %}
-<b>"{{ task.title }}"</b>, <i>{{ task.state }}</i> {{ task.estimate }} Из сборника:{{ task.roadmap.roadmap_name }} <a href={% url 'edit_tsk' task.id %}>Редактировать</a> <a href={% url 'del_tsk' task.id %}>удалить</a>
-        <br>
-    {% empty %}
-        <b>Все задачи удалены</b>
+    <tr>
+        <td>{{ task.title }}</td>
+        <td>{% if task.state %} Готова {% else %} Надо доделать {% endif %}</td>
+        {% timezone TIME_ZONE %}
+        <td>{{ task.estimate|date:"d N Y, H:i" }}</td>
+        {% endtimezone %}
+        <td>{{ task.roadmap.roadmap_name }}</td>
+        <td><a href={% url 'edit_tsk' task.id %}>Редактировать</a></td>
+        <td><a href={% url 'del_tsk' task.id %}>удалить</a></td>
+    </tr>
     {% endfor %}
-<br>
-<br>
-<a href={% url 'create_task' %}>Создать задачу</a>
-<br>
-<a href={% url 'all_roadmap' %}>Список Roamap's</a>
-<br>
-<a href={% url 'stats_all' %}>Просмотр стаистики</a>
+</table>
+
+{% else %}
+
+<div class="well">Задачи отсутствуют</div>
+
+{% endif %}
+
 {% endblock %}

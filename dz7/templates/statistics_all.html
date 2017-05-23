@@ -3,14 +3,16 @@
     <h2>Просмотр статистики</h2>
 
     <br>
-<table border="1">
+<table class="table table-striped">
     <caption>таблица статистики</caption>
+    <thead>
     <tr>
-    <th>Номер недели</th>
-    <th>Интервал дат</th>
-    <th>Создано задач</th>
-    <th>Решено задач</th>
+        <th>Номер недели</th>
+        <th>Интервал дат</th>
+        <th>Создано задач</th>
+        <th>Решено задач</th>
     </tr>
+    </thead>
     {% for stroke in info %}
         <tr>
         {% for item in range %}
@@ -22,12 +24,14 @@
 </table>
 
     <br>
-<table border="1">
+<table class="table table-striped">
     <caption>Очки</caption>
+    <thead>
     <tr>
         <th>Месяц</th>
         <th>Зачислено</th>
     </tr>
+    </thead>
     {% for stroke in score %}
         <tr>
         {% for item in range2 %}
@@ -37,11 +41,5 @@
         </tr>
     {% endfor %}
 </table>
-
-
-    <br>
-    <br>
-<a href={% url 'all_tasks' %}>Вернуться к списку задач</a>
-<br>
 
 {% endblock %}

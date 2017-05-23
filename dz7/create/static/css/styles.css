@@ -1,0 +1,9 @@
+.redtext {
+    color: red; /* Красный цвет выделения */
+    }
+
+body {
+    font: 11pt Arial, Helvetica, sans-serif; /* Рубленый шрифт текста */
+    margin: 0; /* Отступы на странице */
+    background: #333;
+    }

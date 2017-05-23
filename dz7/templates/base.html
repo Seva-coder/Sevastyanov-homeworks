@@ -1,26 +1,91 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
     <head>
         <title>213</title>
     </head>
-    <style>
-    .redtext {
-    color: red; /* Красный цвет выделения */
-    }
-    </style>
-    <body>
-        Большой брат определил вас как: {{ request.user }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
 
-        {% block content %}{% endblock %}
+<body>
 
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
 
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Планировщик задач</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+
+        {% if request.user.is_authenticated %}
+
+        <li><a href="{% url 'acc_view' %}"><span class="glyphicon glyphicon-user"></span>{{ request.user.email }}</a></li>
+        <li><a href="{% url 'logout_view' %}"><span class="glyphicon glyphicon-log-in"></span>Выйти</a></li>
+
+        {% else %}
+
+        <li><a href="{% url 'reg' %}"><span class="glyphicon glyphicon-user"></span>Зарегаться без SMS и..</a></li>
+        <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span>Войти</a></li>
+
+        {% endif %}
+
     </ul>
+  </div>
+</nav>
+
+
+<nav class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <p class="navbar-brand">Техноатом, 2017</p>
+        </div>
+    </div>
+</nav>
+
+
+  <div class="col-sm-3">
+      {% if request.user.is_authenticated %}
+      <div class="panel-info">
+          <div class="panel-heading">Разделы сервиса:</div>
+          <div class="list-group">
+          <a href="{% url 'all_roadmap' %}" class="list-group-item">Список Roadmap's</a>
+          <a href="{% url 'create_roadmap' %}" class="list-group-item">Создать Roadmap's</a>
+          <a href="{% url 'all_tasks' %}" class="list-group-item">Список задач</a>
+          <a href="{% url 'create_task' %}" class="list-group-item">Создать задачу</a>
+          <a href="{% url 'stats_all' %}" class="list-group-item">Статка</a>
+          </div>
+      </div>
+      {% else %}
+        <div class="panel-info">
+          <div class="panel-heading">Разделы сервиса:</div>
+          <div class="list-group">
+          <li class="list-group-item disabled">Список Roadmap's</li>
+          <li class="list-group-item disabled">Создать Roadmap's</li>
+          <li class="list-group-item disabled">Список задач</li>
+          <li class="list-group-item disabled">Создать задачу</li>
+          <li class="list-group-item disabled">Статка</li>
+          </div>
+        </div>
+      {% endif %}
+  </div>
+
+
+    <div class="col-sm-9">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>{{ message }}</strong>
+        </div>
+        {% endfor %}
     {% endif %}
+
+    {% block content %}{% endblock %}
+
+    </div>
+
+
 
 
 
@@ -33,5 +98,5 @@
          </ul>
         {% endif %}
 
-    </body>
+            </body>
 </html>

@@ -1,10 +1,9 @@
 from django.core.exceptions import ValidationError
-from datetime import datetime
 from django import forms
 from .models import Task, Roadmap, TaskUser
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
-
+from django.contrib import messages
 
 class CreateTask(forms.ModelForm):
     class Meta:
@@ -16,7 +15,9 @@ class CreateTask(forms.ModelForm):
         self.choices = kwargs.pop('choices')
         super().__init__(*args, **kwargs)
         self.fields['roadmap'].choices = self.choices
-    roadmap = forms.ChoiceField(widget=forms.Select, label='К какому Roadmap относится?')
+        self.fields['roadmap'].widget.attrs.update({'class': 'form-control'})
+
+    roadmap = forms.ChoiceField(widget=forms.Select, label='Roadmap?')
 
     def clean_estimate(self):
         value = self.cleaned_data.get('estimate')
