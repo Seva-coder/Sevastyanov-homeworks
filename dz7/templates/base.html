@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>213</title>
+        <title>{% block title %}{% endblock %}</title>
     </head>
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
 
@@ -49,22 +49,26 @@
       <div class="panel-info">
           <div class="panel-heading">Разделы сервиса:</div>
           <div class="list-group">
-          <a href="{% url 'all_roadmap' %}" class="list-group-item">Список Roadmap's</a>
-          <a href="{% url 'create_roadmap' %}" class="list-group-item">Создать Roadmap's</a>
-          <a href="{% url 'all_tasks' %}" class="list-group-item">Список задач</a>
-          <a href="{% url 'create_task' %}" class="list-group-item">Создать задачу</a>
-          <a href="{% url 'stats_all' %}" class="list-group-item">Статка</a>
+              <a href="{% url 'all_roadmap' %}" class="list-group-item">Список Roadmap's</a>
+              <a href="{% url 'create_roadmap' %}" class="list-group-item">Создать Roadmap's</a>
+              <a href="{% url 'all_tasks' %}" class="list-group-item">Список задач</a>
+              <a href="{% url 'create_task' %}" class="list-group-item">Создать задачу</a>
+              <a href="{% url 'stats_all' %}" class="list-group-item">Статка</a>
+              <a href="{% url 'acc_edit' %}" class="list-group-item">Редактировать профиль</a>
+              <a href="{% url 'password_change' %}" class="list-group-item">Сменить пароль</a>
           </div>
       </div>
       {% else %}
         <div class="panel-info">
           <div class="panel-heading">Разделы сервиса:</div>
           <div class="list-group">
-          <li class="list-group-item disabled">Список Roadmap's</li>
-          <li class="list-group-item disabled">Создать Roadmap's</li>
-          <li class="list-group-item disabled">Список задач</li>
-          <li class="list-group-item disabled">Создать задачу</li>
-          <li class="list-group-item disabled">Статка</li>
+              <li class="list-group-item disabled">Список Roadmap's</li>
+              <li class="list-group-item disabled">Создать Roadmap's</li>
+              <li class="list-group-item disabled">Список задач</li>
+              <li class="list-group-item disabled">Создать задачу</li>
+              <li class="list-group-item disabled">Статка</li>
+              <li class="list-group-item disabled">Редактировать профиль</li>
+              <li class="list-group-item disabled">Сменить пароль</li>
           </div>
         </div>
       {% endif %}

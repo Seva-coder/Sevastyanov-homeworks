@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% block title %}Просмотр аккаунта{% endblock %}
+
 {% block content %}
     <h2>Просмотр аккаунта</h2>
 
     <br>
 
-<table border="1">
+<table class="table table-striped">
     <caption>Данные пользоваетля</caption>
     <tr>   <th>E-m@il:</th> <td>{{ request.user.email }}</td> </tr>   <tr>
     <tr>   <th>Имя:</th> <td>{{ request.user.first_name }}</td> </tr>   <tr>

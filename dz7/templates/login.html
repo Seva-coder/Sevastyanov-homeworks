@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% block title %}Авторизация{% endblock %}
 
 {% block content %}
 
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+<p>Пароль неверный</p>
 {% endif %}
 
 {% if next %}
@@ -11,10 +12,11 @@
     <p>Your account doesn't have access to this page. To proceed,
     please login with an account that has access.</p>
     {% else %}
-    <p>Please login to see this page.</p>
+    <p>Аутентифицируйтесь:</p>
     {% endif %}
 {% endif %}
 
+{% comment %}
 <form method="post" action="{% url 'login' %}">
 {% csrf_token %}
 <table>
@@ -27,10 +29,24 @@
     <td>{{ form.password }}</td>
 </tr>
 </table>
+{% endcomment %}
 
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
 
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input id="email" type="text" class="form-control" name="{{ form.username.name }}" placeholder="{{ form.username.label }}">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input id="password" type="password" class="form-control" name="{{ form.password.name }}" placeholder="{{ form.password.label }}">
+        </div>
+
+        <input type="submit" value="Авторизоваться" class="btn btn-default"/>
+
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
 
 {% endblock %}
