@@ -3,7 +3,7 @@ from django import forms
 from .models import Task, Roadmap, TaskUser
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
-from django.contrib import messages
+
 
 class CreateTask(forms.ModelForm):
     class Meta:
@@ -12,9 +12,9 @@ class CreateTask(forms.ModelForm):
         exclude = ['creation_date']
 
     def __init__(self, *args, **kwargs):  # шайтан-код для автоматического обновления select'a на форме
-        self.choices = kwargs.pop('choices')
+        self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        self.fields['roadmap'].choices = self.choices
+        self.fields['roadmap'].choices = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
         self.fields['roadmap'].widget.attrs.update({'class': 'form-control'})
 
     roadmap = forms.ChoiceField(widget=forms.Select, label='Roadmap?')
@@ -50,23 +50,10 @@ class EditTask(forms.ModelForm):
     def __init__(self, *args, **kwargs):  # шайтан-код для автоматического обновления select'a на форме
         self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        #kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
         self.fields['roadmap'].choices = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
         self.fields['roadmap'].widget.attrs.update({'class': 'form-control'})
 
     id_task = forms.IntegerField(widget=forms.HiddenInput())
-
-
-# class EditTask(CreateTask):
-#     def __init__(self, *args, **kwargs):
-#         self.user = kwargs.pop('user')  # для выдачи юзеру только его Roadmap's в выпадающем списке
-#         kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
-#         super().__init__(*args, **kwargs)
-#     id_task = forms.IntegerField(widget=forms.HiddenInput())
-#
-#     def clean_estimate(self):  # чтобы можно было испралять state после того как срок прошёл
-#         value = self.cleaned_data.get('estimate')
-#         return value
 
 
 class CreateNewUser(UserCreationForm):

@@ -82,7 +82,7 @@ def delete_roadmap(request, id_road):
 def create_task(request):
     variants = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=request.user)]
     if request.method == 'POST':
-        form = CreateTask(request.POST, choices=variants)
+        form = CreateTask(request.POST, user=request.user)  # choices=variants
         if form.is_valid():
             task = form.save(commit=False)
             task.roadmap = Roadmap.objects.get(pk=int(form.cleaned_data['roadmap']))
@@ -95,9 +95,9 @@ def create_task(request):
             return redirect('all_tasks')
         else:
             messages.add_message(request, messages.WARNING, 'В форме что-то не так')
-            new_form = CreateTask(request.POST, choices=variants, initial={'title': request.POST['title'],
-                                                                           'estimate': request.POST['estimate'],
-                                                                           'state': request.POST.get('state')})
+            new_form = CreateTask(request.POST, initial={'title': request.POST['title'],
+                                                         'estimate': request.POST['estimate']},
+                                  user=request.user)  # choices=variants  'state': request.POST.get('state')
             return render(
                 request, 'create_task.html',
                 {'form': new_form}
@@ -109,7 +109,7 @@ def create_task(request):
                 request, 'create_task.html',
             )  # не выдаём форму, шаблон на её место подставит ссылку на создание Roadmap
         else:
-            form = CreateTask(choices=variants)
+            form = CreateTask(user=request.user)
             return render(
                 request, 'create_task.html',
                 {'form': form}

@@ -11,8 +11,8 @@
     <tr>   <th>E-m@il:</th> <td>{{ request.user.email }}</td> </tr>   <tr>
     <tr>   <th>Имя:</th> <td>{{ request.user.first_name }}</td> </tr>   <tr>
     <tr>   <th>Фамилия</th> <td>{{ request.user.last_name }}</td> </tr>   <tr>
-    <tr>   <th>Возраст:</th> <td>{{ request.user.age }}</td> </tr>   <tr>
-    <tr>   <th>Локация:</th> <td>{{ request.user.region }}</td> </tr>   <tr>
+    <tr>   <th>Возраст:</th> <td>{{ request.user.age|default_if_none:"Не указано" }}</td> </tr>
+    <tr>   <th>Локация:</th> <td>{{ request.user.region|default_if_none:"Не указано" }}</td> </tr>   <tr>
 </table>
 
 
