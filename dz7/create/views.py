@@ -51,18 +51,31 @@ def all_roadmaps(request):
     )
 
 
+def deleter(model, request, id_some, redirect_way):  # где лучше разместить?
+    """Удаление Roadmap/Task с последующим сообщением и redirect"""
+    def fail():
+        nonlocal redirect_way
+        nonlocal request
+        messages.add_message(request, messages.ERROR, 'вы не можете это удалить ;)')
+        return redirect(redirect_way)
+    try:
+        if int(id_some) < MAX_ID:  # чтобы не отлавливать дополнително Overflow error
+            instance = model.objects.get(pk=id_some)
+            if instance.user == request.user:
+                instance.delete()
+                messages.add_message(request, messages.SUCCESS, 'Удалено')
+                return redirect(redirect_way)
+            else:
+                return fail()
+        else:
+            return fail()
+    except model.DoesNotExist:
+        return fail()
+
+
 @login_required
 def delete_roadmap(request, id_road):
-    if int(id_road) > MAX_ID:
-        messages.add_message(request, messages.ERROR, 'вы не можете удалить этот Roadmap ;)')
-        return redirect('all_roadmap')
-    elif Roadmap.objects.filter(pk=id_road).exists() and Roadmap.objects.get(pk=id_road).user == request.user:
-        Roadmap.objects.get(pk=id_road).delete()
-        messages.add_message(request, messages.SUCCESS, 'Roadmap удалён')
-        return redirect('all_roadmap')
-    else:
-        messages.add_message(request, messages.ERROR, 'вы не можете удалить этот Roadmap ;)')
-        return redirect('all_roadmap')
+    return deleter(Roadmap, request, id_road, 'all_roadmap')
 
 
 @login_required
@@ -114,22 +127,7 @@ def all_tasks(request):
 
 @login_required
 def delete_task(request, id_task):
-    try:
-        if int(id_task) < MAX_ID:  # чтобы не отлавливать дополнително Overflow error
-            instance = Task.objects.get(pk=id_task)
-            if instance.user == request.user:
-                instance.delete()
-                messages.add_message(request, messages.SUCCESS, 'Задача удалена')
-                return redirect('all_tasks')
-            else:
-                messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
-                return redirect('all_tasks')
-        else:
-            messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
-            return redirect('all_tasks')
-    except Task.DoesNotExist:
-        messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
-        return redirect('all_tasks')
+    return deleter(Task, request, id_task, 'all_tasks')
 
 
 @login_required
@@ -142,34 +140,10 @@ def edit_task(request, id_task=-1):  # '-1' переназначится из с
                 messages.add_message(request, messages.ERROR, 'вы не можете редактировать эту задачу ;)')
                 return redirect('all_tasks')
             elif Task.objects.filter(pk=id_task).exists() and Task.objects.get(pk=id_task).user == request.user:
-                old_task = Task.objects.get(pk=id_task)
-                old_state = old_task.state
-                old_estimate = old_task.estimate
-                task = old_task
+                task = Task.objects.get(pk=id_task)
                 form = EditTask(request.POST, instance=task, user=request.user)
                 task = form.save(commit=False)
-                task.roadmap = Roadmap.objects.get(pk=form.cleaned_data['roadmap'])
                 task.save()
-                if form.cleaned_data['state'] != old_state:
-                    if form.cleaned_data['state'] is True and old_state is False:
-                        today = timezone.now()
-                        creation_date = task.creation_date
-                        abc = Task.objects.annotate(
-                            delta=ExpressionWrapper(
-                                F('estimate')-F('creation_date'), output_field=DurationField()
-                            )
-                        )
-                        max_estimate = abc.aggregate(Max('delta'))
-                        scores = (today-creation_date)/(old_estimate-creation_date) + \
-                                 (old_estimate-creation_date)/(max_estimate['delta__max'])
-                        getcontext().prec = 6  # 6 цифр для Decimal, как в бд
-                        if Decimal(scores) > Decimal(999.999):   # превышшение max значеня БД
-                            Scores.objects.filter(task=task).update(points=Decimal(999.999))
-                        elif Decimal(scores) < Decimal(-999.999):   # превышшение max/min значеня БД
-                            Scores.objects.filter(task=task).update(points=Decimal(-999.999))
-                        else:
-                            Scores.objects.filter(task=task).update(points=Decimal(scores))
-                        Scores.objects.filter(task=task).update(date=today)
                 messages.add_message(request, messages.SUCCESS, 'Задача отредактирована')
                 return redirect('all_tasks')
             else:
@@ -187,9 +161,9 @@ def edit_task(request, id_task=-1):  # '-1' переназначится из с
         if int(id_task) < MAX_ID and Task.objects.filter(pk=id_task).exists() and \
                         Task.objects.get(pk=id_task).user == request.user:
             current_task = Task.objects.get(pk=id_task)
-            form = EditTask(initial={'title': current_task.title, 'state': current_task.state,
+            form = EditTask(initial={'title': current_task.title,
                                      'estimate': current_task.estimate, 'id_task': id_task,
-                                     'roadmap': current_task.roadmap.id}, user=request.user)
+                                     'roadmap': current_task.roadmap.id}, user=request.user)  # 'state': current_task.state,
             return render(
                 request, 'edit_task.html',
                 {'form': form, 'fail': False}
@@ -286,3 +260,42 @@ def edit_user(request):
             request, 'acc_edit.html',
             {'form': form}
         )
+
+
+@login_required
+def task_ready(request, id_task):
+    if int(id_task) < MAX_ID:
+        try:
+            instance = Task.objects.get(pk=id_task)
+            if instance.user == request.user and instance.state is False:
+                today = timezone.now()
+                creation_date = instance.creation_date
+                abc = Task.objects.annotate(
+                    delta=ExpressionWrapper(
+                        F('estimate') - F('creation_date'), output_field=DurationField()
+                    )
+                )
+                max_estimate = abc.aggregate(Max('delta'))
+                scores = (today - creation_date) / (instance.estimate - creation_date) +\
+                         (instance.estimate - creation_date) / (max_estimate['delta__max'])
+                getcontext().prec = 6  # 6 цифр для Decimal, как в бд
+                if Decimal(scores) > Decimal(999.999):  # превышшение max значеня БД
+                    Scores.objects.filter(task=instance).update(points=Decimal(999.999))
+                elif Decimal(scores) < Decimal(-999.999):  # превышшение max/min значеня БД
+                    Scores.objects.filter(task=instance).update(points=Decimal(-999.999))
+                else:
+                    Scores.objects.filter(task=instance).update(points=Decimal(scores))
+                Scores.objects.filter(task=instance).update(date=today)
+                instance.state = True
+                instance.save()
+                messages.add_message(request, messages.SUCCESS, 'Задача отредактирована')
+                return redirect('all_tasks')
+            else:
+                messages.add_message(request, messages.ERROR, 'случисля фэил :(')
+                return redirect('all_tasks')
+        except Task.DoesNotExist:
+            messages.add_message(request, messages.ERROR, 'случисля фэил :(')
+            return redirect('all_tasks')
+    else:
+        messages.add_message(request, messages.ERROR, 'случисля фэил :(')
+        return redirect('all_tasks')

@@ -25,7 +25,7 @@
       <input type="datetime-local" class="form-control" id="{{ form.estimate.id_for_label }}" name="{{ form.estimate.name }}" value="{% if not fail %}{{ form.estimate.value|default_if_none:''|date:"Y-m-d\TH:i" }}{% else %}{{ request.POST.estimate }}{% endif %}" required>
     </div>
   </div>
-
+{% comment %}
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <div class="checkbox">
@@ -33,6 +33,7 @@
       </div>
     </div>
   </div>
+{% endcomment %}
 
       <div class="form-group">
               <label class="control-label col-sm-2" for="{{ form.roadmap.id_for_label }}">{{ form.roadmap.label }}</label>

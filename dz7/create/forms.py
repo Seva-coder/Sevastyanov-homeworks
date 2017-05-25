@@ -8,7 +8,7 @@ from django.contrib import messages
 class CreateTask(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'state', 'estimate']
+        fields = ['title', 'estimate']  # 'state'
         exclude = ['creation_date']
 
     def __init__(self, *args, **kwargs):  # шайтан-код для автоматического обновления select'a на форме
@@ -42,16 +42,31 @@ class CreateRoadmap(forms.ModelForm):
         return value
 
 
-class EditTask(CreateTask):
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')  # для выдачи юзеру только его Roadmap's в выпадающем списке
-        kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
+class EditTask(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['title', 'estimate', 'roadmap']
+
+    def __init__(self, *args, **kwargs):  # шайтан-код для автоматического обновления select'a на форме
+        self.user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
+        #kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
+        self.fields['roadmap'].choices = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
+        self.fields['roadmap'].widget.attrs.update({'class': 'form-control'})
+
     id_task = forms.IntegerField(widget=forms.HiddenInput())
 
-    def clean_estimate(self):  # чтобы можно было испралять state после того как срок прошёл
-        value = self.cleaned_data.get('estimate')
-        return value
+
+# class EditTask(CreateTask):
+#     def __init__(self, *args, **kwargs):
+#         self.user = kwargs.pop('user')  # для выдачи юзеру только его Roadmap's в выпадающем списке
+#         kwargs['choices'] = [(road.id, road.roadmap_name) for road in Roadmap.objects.filter(user=self.user)]
+#         super().__init__(*args, **kwargs)
+#     id_task = forms.IntegerField(widget=forms.HiddenInput())
+#
+#     def clean_estimate(self):  # чтобы можно было испралять state после того как срок прошёл
+#         value = self.cleaned_data.get('estimate')
+#         return value
 
 
 class CreateNewUser(UserCreationForm):

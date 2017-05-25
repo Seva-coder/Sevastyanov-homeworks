@@ -25,7 +25,7 @@ class Task(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     roadmap = models.ForeignKey('Roadmap', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, verbose_name='Название задачи:')
-    state = models.BooleanField(verbose_name='Задача решена?')  # models.CharField(max_length=11, verbose_name='статус:')
+    state = models.BooleanField(verbose_name='Задача решена?', default=False)  # models.CharField(max_length=11, verbose_name='статус:')
     estimate = models.DateTimeField(verbose_name='Срок выполнения:')
     creation_date = models.DateTimeField(null=True)
 

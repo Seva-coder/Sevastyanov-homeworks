@@ -16,7 +16,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from create.views import create_roadmap, all_roadmaps, delete_roadmap, create_task, all_tasks, delete_task, edit_task, statistic_all, create_user, view_user, edit_user
+from create.views import create_roadmap, all_roadmaps, delete_roadmap, create_task, all_tasks, delete_task, edit_task,\
+    statistic_all, create_user, view_user, edit_user, task_ready
 from django.views.generic.base import TemplateView
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     url(r'^deleteTask/(?P<id_task>[0-9]+)$', delete_task, name='del_tsk'),
     url(r'^editTask/(?P<id_task>[0-9]+)$', edit_task, name='edit_tsk'),
     url(r'^editTask/$', edit_task, name='edit_tsk'),
+    url(r'^ready/(?P<id_task>[0-9]+)$', task_ready, name='task_ready'),
     url(r'^statsAll/$', statistic_all, name='stats_all'),
     url(r'^reg/$', create_user, name='reg'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),

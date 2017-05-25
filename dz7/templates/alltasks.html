@@ -29,6 +29,7 @@
         {% endtimezone %}
         <td>{{ task.roadmap.roadmap_name }}</td>
         <td><a href={% url 'edit_tsk' task.id %}>Редактировать</a></td>
+        <td>{% if not task.state %} <a href={% url 'task_ready' task.id %}>задача решена</a>{% endif %}</td>
         <td><a href={% url 'del_tsk' task.id %}>удалить</a></td>
     </tr>
     {% endfor %}
