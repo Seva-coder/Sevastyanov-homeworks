@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 
 class TaskUser(AbstractUser):
@@ -9,6 +10,8 @@ class TaskUser(AbstractUser):
     age = models.IntegerField(verbose_name='Возраст:', null=True, blank=True)
     region = models.CharField(max_length=20, verbose_name='Регион:', blank=True, null=True)
     username = models.CharField(max_length=10, verbose_name='Имя которое не нужно:', blank=True, null=True) # не убрать(
+    first_name = models.CharField(_('first name'), max_length=30)  # переопределённые поля
+    last_name = models.CharField(_('last name'), max_length=150)
     REQUIRED_FIELDS = ['phone', 'first_name', 'last_name', 'username'] # 'username'
     USERNAME_FIELD = 'email'
 

@@ -114,14 +114,20 @@ def all_tasks(request):
 
 @login_required
 def delete_task(request, id_task):
-    if int(id_task) > MAX_ID:
-        messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
-        return redirect('all_tasks')
-    elif Task.objects.filter(pk=id_task).exists() and Task.objects.get(pk=id_task).user == request.user:  # удалить только свои Task
-        Task.objects.get(pk=id_task).delete()
-        messages.add_message(request, messages.SUCCESS, 'Задача удалена')
-        return redirect('all_tasks')
-    else:
+    try:
+        if int(id_task) < MAX_ID:  # чтобы не отлавливать дополнително Overflow error
+            instance = Task.objects.get(pk=id_task)
+            if instance.user == request.user:
+                instance.delete()
+                messages.add_message(request, messages.SUCCESS, 'Задача удалена')
+                return redirect('all_tasks')
+            else:
+                messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
+                return redirect('all_tasks')
+        else:
+            messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
+            return redirect('all_tasks')
+    except Task.DoesNotExist:
         messages.add_message(request, messages.ERROR, 'вы не можете удалить эту задачу ;)')
         return redirect('all_tasks')
 

@@ -59,19 +59,9 @@ class CreateNewUser(UserCreationForm):
         model = TaskUser
         fields = ['email', 'phone', 'first_name', 'last_name', 'age', 'region']
 
-    def __init__(self, *args, **kwargs):  # включение обязательных полей (в AbstractUser они выключены по умолчанию)
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-
 
 class EditUser(forms.ModelForm):  # а как унаследоваться от CreateNewUser без полей и проверки паролей?
     class Meta:
         model = TaskUser
         exclude = ['email', 'password', 'last_login', 'is_superuser', 'groups', 'user_permissions', 'is_staff',
                    'is_active', 'date_joined', 'username']
-
-    def __init__(self, *args, **kwargs):  # включение обязательных полей
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
